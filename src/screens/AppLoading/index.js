@@ -1,15 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import {View} from 'react-native';
-import SlotMachine from 'components/Slot';
+import SlotMachine from 'components/LoadingSlot';
 import {styles} from 'screens/AppLoading/styles';
 
-const AppLoading = () => {
+const AppLoading = ({navigation}) => {
   const [text, handleText] = useState('RTPS');
   const [animation, handleAnimation] = useState(false);
   useEffect(() => {
     setTimeout(() => {
       handleAnimation(true);
       handleText('SLOT');
+      setTimeout(() => {
+        navigation.push('Slots');
+      }, 3000);
     }, 500);
   }, []);
   return (

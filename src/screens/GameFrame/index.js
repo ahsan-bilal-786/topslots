@@ -2,8 +2,9 @@ import React from 'react';
 import {StyleSheet, View, ScrollView, Text} from 'react-native';
 import map from 'lodash/map';
 import range from 'lodash/range';
-import {Header} from 'react-native-elements';
 import {WebView} from 'react-native-webview';
+import Header from 'components/Header';
+
 const games = [
   {
     companyImage:
@@ -52,13 +53,10 @@ const games = [
     joinLink: 'http://tipwin.com/',
   },
 ];
-const GameFrame = () => {
+const GameFrame = ({navigation}) => {
   return (
     <>
-      <Header
-        placement="left"
-        centerComponent={{text: 'Top Slot & Games', style: {color: '#fff'}}}
-      />
+      <Header {...{navigation}} />
       <View style={styles.container}>
         <WebView source={{uri: 'https://spelsverige.se/#primary'}} />
         <View style={{flex: 1}}>

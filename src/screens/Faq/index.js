@@ -1,14 +1,11 @@
 import React from 'react';
 import {StyleSheet, View, Text} from 'react-native';
-import {Header} from 'react-native-elements';
+import Header from 'components/Header';
 
-const Faq = () => {
+const Faq = ({navigation}) => {
   return (
     <>
-      <Header
-        placement="left"
-        centerComponent={{text: 'Top Slot & Games', style: {color: '#fff'}}}
-      />
+      <Header {...{navigation}} />
       <View style={styles.container}>
         <Text
           style={{

@@ -1,86 +1,124 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, ScrollView, Text} from 'react-native';
-import {Header, Icon} from 'react-native-elements';
+import React, {useState} from 'react';
 import map from 'lodash/map';
 import slice from 'lodash/slice';
-import {Table, Row} from 'react-native-table-component';
+import range from 'lodash/range';
+import toLower from 'lodash/toLower';
+import filter from 'lodash/filter';
+import includes from 'lodash/includes';
+import {Picker} from '@react-native-picker/picker';
+import {View, ScrollView, TouchableOpacity, Text} from 'react-native';
+import {Table, TableWrapper, Cell} from 'react-native-table-component';
+import {Input} from 'react-native-elements';
+import Header from 'components/Header';
+import {styles} from 'screens/Slots/styles';
 import rtpSlot from 'screens/Slots/Slot-RTP.json';
 
 const tableConfig = {
-  tableHead: rtpSlot.data[0],
+  tableHead: ['SLOT', 'RTP', 'RISK', 'SUPPLIER'],
   widthArr: [140, 60, 80, 100],
+  bodyWidthArr: [120, 60, 80, 120],
 };
 
-const data = slice(rtpSlot.data, 1, 100);
-
-const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-  const paddingToBottom = 50;
-  return (
-    layoutMeasurement.height + contentOffset.y >=
-    contentSize.height - paddingToBottom
-  );
+const paginationLength = 50;
+const paginationRange = (pageNo) => {
+  const end = pageNo * paginationLength;
+  const start = end - paginationLength;
+  return {start, end};
+};
+const getFilteredData = (search) => {
+  if (search === '') {
+    return rtpSlot.data;
+  }
+  return filter(rtpSlot.data, (val) => {
+    return (
+      includes(toLower(val[0]), toLower(search)) ||
+      includes(toLower(val[3]), toLower(search))
+    );
+  });
 };
 
-const SlotTable = () => {
-  const pagination = 75;
-  const [rows, handleRows] = useState([]);
+const SlotTable = ({navigation}) => {
+  const [pageNo, handlePageNo] = useState(1);
   const [search, handleSearch] = useState('');
+  const {start, end} = paginationRange(pageNo);
+  const filteredData = getFilteredData(search);
+  const rows = slice(filteredData, start, end);
 
-  const addRows = () => {
-    const currentRowsLength = rows.length;
-    if (currentRowsLength < data.length) {
-      const newLength = currentRowsLength + pagination;
-      handleRows(slice(data, 0, newLength));
-    }
-  };
+  const linkedCell = (data, index) => (
+    <TouchableOpacity onPress={() => navigation.push('Faq')}>
+      <Text style={[styles.underline, styles.textWhite]}>{data}</Text>
+    </TouchableOpacity>
+  );
 
-  const onScroll = ({nativeEvent}) => {
-    if (isCloseToBottom(nativeEvent)) {
-      addRows();
-    }
-  };
-  useEffect(() => {
-    addRows();
-  }, []);
+  const slotViewCell = (data, index) => (
+    <TouchableOpacity onPress={() => navigation.push('GameFrame')}>
+      <Text style={styles.underline}>{data}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <>
-      <Header
-        placement="left"
-        centerComponent={{text: 'Top Slot & Games', style: {color: '#fff'}}}
-      />
+      <Header />
       <View style={styles.container}>
+        <View style={styles.filterPanel}>
+          <View style={styles.paginationPanel}>
+            <Picker
+              selectedValue={pageNo}
+              style={styles.picker}
+              onValueChange={(itemValue, itemIndex) => handlePageNo(itemValue)}>
+              {map(range(1, filteredData.length / paginationLength), (val) => (
+                <Picker.Item key={val} label={`${val}`} value={val} />
+              ))}
+            </Picker>
+          </View>
+          <View style={styles.searchPanel}>
+            <Input
+              placeholder="Search"
+              value={search}
+              onChangeText={(text) => handleSearch(text)}
+            />
+          </View>
+        </View>
         <ScrollView horizontal={true}>
           <View>
-            <Table borderStyle={{borderColor: '#C1C0B9'}}>
-              <Row
-                data={tableConfig.tableHead}
-                widthArr={tableConfig.widthArr}
-                style={styles.head}
-                textStyle={styles.text}
-              />
-            </Table>
-            <ScrollView
-              style={styles.dataWrapper}
-              onScroll={onScroll}
-              scrollEventThrottle={400}>
-              <Table
-                borderStyle={{borderColor: '#C1C0B9'}}
-                pagination
-                paginationServer
-                paginationTotalRows={rtpSlot.data.length}
-                selectableRows
-                paginationPerPage={10}>
-                {map(rows, (dataRow, index) => (
-                  <Row
-                    key={index}
-                    data={dataRow}
-                    widthArr={tableConfig.widthArr}
+            <Table borderStyle={styles.tableBorder}>
+              <TableWrapper style={styles.tableWrapper}>
+                {map(tableConfig.tableHead, (cellData, cellIndex) => (
+                  <Cell
+                    key={cellIndex}
+                    data={
+                      [1, 2].includes(cellIndex)
+                        ? linkedCell(cellData)
+                        : cellData
+                    }
                     style={[
-                      styles.row,
-                      index % 2 && {backgroundColor: '#ffffff'},
+                      styles.head,
+                      {width: tableConfig.widthArr[cellIndex]},
                     ]}
-                    textStyle={styles.text}
+                    textStyle={[styles.text, styles.textWhite]}
                   />
+                ))}
+              </TableWrapper>
+            </Table>
+            <ScrollView style={styles.dataWrapper} scrollEventThrottle={400}>
+              <Table borderStyle={styles.tableBorder}>
+                {map(rows, (dataRow, index) => (
+                  <TableWrapper key={index} style={styles.tableWrapper}>
+                    {map(dataRow, (cellData, cellIndex) => (
+                      <Cell
+                        key={cellIndex}
+                        data={
+                          cellIndex === 0 ? slotViewCell(cellData) : cellData
+                        }
+                        style={[
+                          styles.row,
+                          index % 2 && styles.tableEvenRow,
+                          {width: tableConfig.bodyWidthArr[cellIndex]},
+                        ]}
+                        textStyle={styles.text}
+                      />
+                    ))}
+                  </TableWrapper>
                 ))}
               </Table>
             </ScrollView>
@@ -90,29 +128,5 @@ const SlotTable = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    paddingTop: 30,
-    backgroundColor: '#ffffff',
-  },
-  head: {
-    height: 50,
-    backgroundColor: '#6F7BD9',
-  },
-  text: {
-    textAlign: 'center',
-    fontWeight: '200',
-  },
-  dataWrapper: {
-    marginTop: -1,
-  },
-  row: {
-    height: 40,
-    backgroundColor: '#F7F8FA',
-  },
-});
 
 export default SlotTable;

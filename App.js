@@ -14,7 +14,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="GameFrame">
+        <Stack.Navigator initialRouteName="AppLoading">
           <Stack.Screen
             name="AppLoading"
             component={AppLoading}
