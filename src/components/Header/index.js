@@ -22,7 +22,7 @@ const AppHeader = ({navigation, title}) => {
       backgroundColor="#F00"
       placement="left"
       centerComponent={{
-        text: title || 'Top Slot & Games',
+        text: title || 'Slot RTPs',
         style: {color: '#fff'},
       }}
       {...headerProps}
