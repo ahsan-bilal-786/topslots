@@ -61,22 +61,21 @@ const GameFrame = ({route, navigation}) => {
   return (
     <>
       <Header {...{navigation}} title={Slot} />
-      <View style={styles.container}>
-        {!gameView ? (
-          <>
-            <Image
-              source={{uri: cover_photo}}
-              style={{height: 400, marginBottom: 10}}
-            />
-            <Button
-              title={`Play ${Slot}`}
-              onPress={() => toggleGameView(!gameView)}
-            />
-          </>
-        ) : (
-          <WebView source={{uri: iframe_src}} />
-        )}
-      </View>
+
+      {!gameView ? (
+        <View style={styles.container}>
+          <Image
+            source={{uri: cover_photo}}
+            style={{height: 400, marginBottom: 10}}
+          />
+          <Button
+            title={`Play ${Slot}`}
+            onPress={() => toggleGameView(!gameView)}
+          />
+        </View>
+      ) : (
+        <WebView source={{uri: iframe_src}} />
+      )}
     </>
   );
 };
