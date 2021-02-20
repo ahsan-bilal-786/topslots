@@ -7,17 +7,27 @@ import filter from 'lodash/filter';
 import includes from 'lodash/includes';
 import size from 'lodash/size';
 import {Picker} from '@react-native-picker/picker';
-import {View, ScrollView, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+} from 'react-native';
 import {Table, TableWrapper, Cell} from 'react-native-table-component';
 import {Input} from 'react-native-elements';
 import Header from 'components/Header';
 import {styles} from 'screens/Slots/styles';
 import rtpSlot from 'screens/Slots/Slots.json';
 
+const getWidth = (width) => {
+  return (Dimensions.get('window').width * width) / 100;
+};
+
 const tableConfig = {
   tableHead: ['SLOT', 'RTP', 'RISK', 'SUPPLIER'],
-  widthArr: [140, 60, 80, 100],
-  bodyWidthArr: [120, 60, 80, 120],
+  widthArr: [getWidth(30), getWidth(15), getWidth(20), getWidth(27)],
+  bodyWidthArr: [getWidth(30), getWidth(15), getWidth(20), getWidth(27)],
 };
 
 const paginationLength = 50;
@@ -44,7 +54,6 @@ const SlotTable = ({navigation}) => {
   const {start, end} = paginationRange(pageNo);
   const filteredData = getFilteredData(search);
   const rows = slice(filteredData, start, end);
-
   const linkedCell = (data, index) => (
     <TouchableOpacity onPress={() => navigation.push('Faq')}>
       <Text style={[styles.underline, styles.textWhite]}>{data}</Text>
@@ -125,7 +134,7 @@ const SlotTable = ({navigation}) => {
                       textStyle={styles.text}
                     />
                     <Cell
-                      data={slotViewCell(dataRow.RISK, index)}
+                      data={slotViewCell(dataRow.RSK, index)}
                       style={[
                         styles.row,
                         index % 2 && styles.tableEvenRow,
