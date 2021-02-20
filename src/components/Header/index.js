@@ -10,7 +10,7 @@ const LeftComponent = ({link}) => {
   );
 };
 
-const AppHeader = ({navigation}) => {
+const AppHeader = ({navigation, title}) => {
   let headerProps = {};
   if (navigation) {
     headerProps.leftComponent = (
@@ -21,7 +21,10 @@ const AppHeader = ({navigation}) => {
     <Header
       backgroundColor="#F00"
       placement="left"
-      centerComponent={{text: 'Top Slot & Games', style: {color: '#fff'}}}
+      centerComponent={{
+        text: title || 'Top Slot & Games',
+        style: {color: '#fff'},
+      }}
       {...headerProps}
     />
   );

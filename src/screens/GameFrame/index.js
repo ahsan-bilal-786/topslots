@@ -1,9 +1,10 @@
-import React from 'react';
-import {StyleSheet, View, ScrollView, Text} from 'react-native';
-import map from 'lodash/map';
-import range from 'lodash/range';
+import React, {useState} from 'react';
+import {StyleSheet, View, Image} from 'react-native';
+import get from 'lodash/get';
+import {Button} from 'react-native-elements';
 import {WebView} from 'react-native-webview';
 import Header from 'components/Header';
+import rtpSlot from 'screens/Slots/Slots.json';
 
 const games = [
   {
@@ -53,21 +54,28 @@ const games = [
     joinLink: 'http://tipwin.com/',
   },
 ];
-const GameFrame = ({navigation}) => {
+const GameFrame = ({route, navigation}) => {
+  const [gameView, toggleGameView] = useState(false);
+  const gameId = get(route, 'params.gameId', 0);
+  const {Slot, iframe_src, cover_photo} = rtpSlot[gameId];
   return (
     <>
-      <Header {...{navigation}} />
+      <Header {...{navigation}} title={Slot} />
       <View style={styles.container}>
-        <WebView source={{uri: 'https://spelsverige.se/#primary'}} />
-        <View style={{flex: 1}}>
-          {map(games, (game) => {
-            <View style={{flex: 1}}>
-              <View style={{flex: 1}}>
-                <Text>{game.offerTitle}</Text>
-              </View>
-            </View>;
-          })}
-        </View>
+        {!gameView ? (
+          <>
+            <Image
+              source={{uri: cover_photo}}
+              style={{height: 400, marginBottom: 10}}
+            />
+            <Button
+              title={`Play ${Slot}`}
+              onPress={() => toggleGameView(!gameView)}
+            />
+          </>
+        ) : (
+          <WebView source={{uri: iframe_src}} />
+        )}
       </View>
     </>
   );

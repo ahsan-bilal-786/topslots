@@ -5,13 +5,14 @@ import range from 'lodash/range';
 import toLower from 'lodash/toLower';
 import filter from 'lodash/filter';
 import includes from 'lodash/includes';
+import size from 'lodash/size';
 import {Picker} from '@react-native-picker/picker';
 import {View, ScrollView, TouchableOpacity, Text} from 'react-native';
 import {Table, TableWrapper, Cell} from 'react-native-table-component';
 import {Input} from 'react-native-elements';
 import Header from 'components/Header';
 import {styles} from 'screens/Slots/styles';
-import rtpSlot from 'screens/Slots/Slot-RTP.json';
+import rtpSlot from 'screens/Slots/Slots.json';
 
 const tableConfig = {
   tableHead: ['SLOT', 'RTP', 'RISK', 'SUPPLIER'],
@@ -27,9 +28,9 @@ const paginationRange = (pageNo) => {
 };
 const getFilteredData = (search) => {
   if (search === '') {
-    return rtpSlot.data;
+    return rtpSlot;
   }
-  return filter(rtpSlot.data, (val) => {
+  return filter(rtpSlot, (val) => {
     return (
       includes(toLower(val[0]), toLower(search)) ||
       includes(toLower(val[3]), toLower(search))
@@ -51,7 +52,8 @@ const SlotTable = ({navigation}) => {
   );
 
   const slotViewCell = (data, index) => (
-    <TouchableOpacity onPress={() => navigation.push('GameFrame')}>
+    <TouchableOpacity
+      onPress={() => navigation.push('GameFrame', {gameId: index})}>
       <Text style={styles.underline}>{data}</Text>
     </TouchableOpacity>
   );
@@ -66,7 +68,7 @@ const SlotTable = ({navigation}) => {
               selectedValue={pageNo}
               style={styles.picker}
               onValueChange={(itemValue, itemIndex) => handlePageNo(itemValue)}>
-              {map(range(1, filteredData.length / paginationLength), (val) => (
+              {map(range(1, size(filteredData) / paginationLength), (val) => (
                 <Picker.Item key={val} label={`${val}`} value={val} />
               ))}
             </Picker>
@@ -104,20 +106,42 @@ const SlotTable = ({navigation}) => {
               <Table borderStyle={styles.tableBorder}>
                 {map(rows, (dataRow, index) => (
                   <TableWrapper key={index} style={styles.tableWrapper}>
-                    {map(dataRow, (cellData, cellIndex) => (
-                      <Cell
-                        key={cellIndex}
-                        data={
-                          cellIndex === 0 ? slotViewCell(cellData) : cellData
-                        }
-                        style={[
-                          styles.row,
-                          index % 2 && styles.tableEvenRow,
-                          {width: tableConfig.bodyWidthArr[cellIndex]},
-                        ]}
-                        textStyle={styles.text}
-                      />
-                    ))}
+                    <Cell
+                      data={slotViewCell(dataRow.Slot, index)}
+                      style={[
+                        styles.row,
+                        index % 2 && styles.tableEvenRow,
+                        {width: tableConfig.bodyWidthArr[0]},
+                      ]}
+                      textStyle={styles.text}
+                    />
+                    <Cell
+                      data={slotViewCell(dataRow.RTP, index)}
+                      style={[
+                        styles.row,
+                        index % 2 && styles.tableEvenRow,
+                        {width: tableConfig.bodyWidthArr[1]},
+                      ]}
+                      textStyle={styles.text}
+                    />
+                    <Cell
+                      data={slotViewCell(dataRow.RISK, index)}
+                      style={[
+                        styles.row,
+                        index % 2 && styles.tableEvenRow,
+                        {width: tableConfig.bodyWidthArr[2]},
+                      ]}
+                      textStyle={styles.text}
+                    />
+                    <Cell
+                      data={slotViewCell(dataRow.Supplier, index)}
+                      style={[
+                        styles.row,
+                        index % 2 && styles.tableEvenRow,
+                        {width: tableConfig.bodyWidthArr[3]},
+                      ]}
+                      textStyle={styles.text}
+                    />
                   </TableWrapper>
                 ))}
               </Table>
